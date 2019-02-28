@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var app = express();
 var url = require('url');
 var verifyCall = require('../tools/verify');
 var request = require('request-promise');
@@ -42,7 +43,7 @@ router.get('/install', function (req, res, next) {
     //Do I have the token already for this store?
     //Check database
     //For tutorial ONLY - check .env variable value
-  
+    
         //go here if you don't have the token yet
         res.redirect(installUrl);
     
@@ -64,9 +65,7 @@ router.get('/auth', function (req, res, next) {
         securityPass = true;
     } else {
         //exit
-        console.log('regex is not ok');
         securityPass = false;
-
     }
 
     // 1. Parse the string URL to object
@@ -79,7 +78,6 @@ router.get('/auth', function (req, res, next) {
         securityPass = true;
     } else {
         //exit
-        console.log('token is not ok');
         securityPass = false;
     }
 
@@ -105,12 +103,23 @@ router.get('/auth', function (req, res, next) {
             });
     }
     else {
-        console.log('installerror');
         res.redirect('/installerror');
     }
 
 });
 
+
+router.post('/webhooks/orders/create', (req, res) => {
+    try{
+  console.log('🎉 We got an order!');
+  console.log(req.body);
+  res.sendStatus("yay",200);
+}
+catch (error) {
+        console.log('order',error);
+    }
+
+});
 
 router.get('/app', function (req, res, next) {
     let shop = req.query.shop;
@@ -119,16 +128,16 @@ router.get('/app', function (req, res, next) {
 router.post('/app/create-product', function (req, res) {
 
     //this is what we need to post
-    // POST /admin/products.json
-    // {
-    //   "product": {
-    //     "title": "Burton Custom Freestyle 151",
-    //     "body_html": "<strong>Good snowboard!</strong>",
-    //     "vendor": "Burton",
-    //     "product_type": "Snowboard",
-    //     "tags": "Barnes & Noble, John's Fav, &quot;Big Air&quot;"
-    //   }
-    // }
+    POST /admin/products.json
+     {
+       "product": {
+         "title": "Burton Custom Freestyle 151",
+         "body_html": "<strong>Good snowboard!</strong>",
+         "vendor": "Burton",
+         "product_type": "Snowboard",
+         "tags": "Barnes & Noble, John's Fav, &quot;Big Air&quot;"
+       }
+     }
 
 
 
@@ -162,7 +171,6 @@ router.post('/app/create-product', function (req, res) {
             if (response.statusCode == 201) {
                 res.json(true);
             } else {
-                console.log('app js error dfgfdgd');
                 res.json(false);
             }
 
@@ -298,6 +306,7 @@ router.get('/app/products', function (req, res, next) {
 
 
 });
+
 
 
 module.exports = router;
